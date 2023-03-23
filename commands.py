@@ -1,4 +1,5 @@
 from datetime import date, datetime, now
+import calendar
 from utils import check_weekday, check_week_nr, check_date_fields, error_handler
 from db_access import create_customer, create_order, get_orders_by_customer
 # User stories c)
@@ -35,11 +36,16 @@ def get_available_seats(route_id: str, day_str: str, month_str: str, year_str: s
         pass
 
 # User stories g part 2)
-def register_order(customer_id: str, trip_year_str: str, trip_week_nr_str: str, start_station: str, end_station: str, route_id: str, weekday: str, places: list[str]):
+def register_order(customer_id: str, trip_year_str: str, trip_week_nr_str: str, start_station: str, end_station: str, route_id: str, day_str: str, month_str: str, year_str: str, places: list[str]):
+    day = int(day_str)
+    month = int(month_str)
+    year = int(year_str)   
+    check_date_fields(day, month, year)
+    route_date = datetime(year, month, day)
+    week_nr = route_date.date.isocalendar()[1]
+    weekday = calendar.day_name[route_date.weekday()]
     # TODO: GENERATE
-    order_id = 123
-    year = int(trip_year_str)
-    week_nr = int(trip_week_nr_str)
+    order_id = 123     
     start_station = str.capitalize(str.lower(start_station))
     end_station = str.capitalize(str.lower(end_station))
     check_date_fields(1, 1, year)
