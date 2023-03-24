@@ -92,10 +92,8 @@ def get_routes() -> list[Route]:
     cur = con.cursor()
     cur.execute("SELECT * FROM ROUTE")
     results = cur.fetchall()
-    print(f"Fetched {len(results)} routes")
     routes = [
-        RouteStationTime(row[0], row[1], row[2], row[3], row[4])
-        for row in results
+        Route(row[0], row[1], row[2], row[3], row[4]) for row in results
     ]
     con.close()
     return routes

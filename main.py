@@ -42,21 +42,28 @@ def userinput_gas() -> list[str]:
     return input(f"{Fore.GREEN} Route ID: "), input(f"{Fore.GREEN} Day: "), input(f"{Fore.GREEN} Month: "), input(f"{Fore.GREEN} Year: ")
 
 def userinput_ro() -> list[str]:
-    return input(f"{Fore.GREEN} Start Station: "), input(f"{Fore.GREEN} End Station: ") , input(f"{Fore.GREEN} Route ID: "), input(f"{Fore.GREEN} Day: "), input(f"{Fore.GREEN} Month: "),input(f"{Fore.GREEN} Year: "), input(f"{Fore.GREEN} Place 1: "), input(f"{Fore.GREEN} Place 2: ")
+    places = int(input(f"{Fore.GREEN} How many places do you want to book for this order?: "))
+    return (
+        input(f"{Fore.GREEN} Start Station: "),
+        input(f"{Fore.GREEN} End Station: "),
+        input(f"{Fore.GREEN} Route ID: "),
+        input(f"{Fore.GREEN} Day: "),
+        input(f"{Fore.GREEN} Month: "),
+        [input(f" Place {i} (Write on the format: <CarNo-PlaceNo>): ") for i in range(places)],
+    )
+
 
 def userinput_gasr() -> list[str]:
-    return input(f"{Fore.GREEN} Customer Number: "), input(f"{Fore.GREEN} Customer Number: ")
-
-
+    return input(f"{Fore.GREEN} Station: "), input(f"{Fore.GREEN} Weekday: ")
 
 if __name__ == "__main__":
     choice = print_choices()
     while choice != "quit":
         if choice == "1":
-            print(Fore.BLUE + get_all_station_routes(*userinput_gasr()))
+            print(Fore.BLUE, get_all_station_routes(*userinput_gasr()))
             choice = print_choices()
         if choice == "2":
-            print(Fore.BLUE + get_routes_between_stations(*userinput_grbs))
+            print(Fore.BLUE, get_routes_between_stations(*userinput_grbs()))
             choice = print_choices()
         if choice == "3":
             print(Fore.BLUE + register_customer(*userinput_rc()))
@@ -65,7 +72,7 @@ if __name__ == "__main__":
             print(Fore.BLUE + get_available_seats(*userinput_gas()))
             choice = print_choices()
         if choice == "5":       
-            print(Fore.BLUE + get_routes_between_stations(*userinput_ro()))
+            print(Fore.BLUE + register_order(*userinput_ro()))
             choice = print_choices()
         if choice == "6":        
             print(get_future_customer_orders(*userinput_gco()))

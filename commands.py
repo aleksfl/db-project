@@ -7,14 +7,14 @@ from typing import Optional
 # User stories c)
 def get_all_station_routes(station: str, weekday: str):
     # Ensure only first letter in weekday is capitalized
-    station = str.capitalize(str.lower(station))    
+    station = str.capitalize(str.lower(station))
     weekday = str.capitalize(str.lower(weekday))
     check_weekday(weekday)
     all_routes = get_routes()
     route_weekdays = get_route_weekdays()
     route_station_times = get_route_station_times()
-    routes_that_run_on_weekday = list[int]
-    routes_that_pass_station = list[int]
+    routes_that_run_on_weekday = []
+    routes_that_pass_station = []
 
     for r in route_weekdays:
         if r.route_id not in routes_that_run_on_weekday and r.weekday == weekday:
@@ -22,15 +22,16 @@ def get_all_station_routes(station: str, weekday: str):
     for r in route_station_times:
         if (r.route_id not in routes_that_pass_station and r.station_name == station):
             routes_that_pass_station.append(r.route_id)
-    relevant_routes = list[Route]
-    for r in all_routes:
-        if r.route_id in routes_that_run_on_weekday and r.route_id in routes_that_pass_station:
-            relevant_routes.append(r)
-    
+    relevant_routes = [
+        r
+        for r in all_routes
+        if r.route_id in routes_that_run_on_weekday
+        and r.route_id in routes_that_pass_station
+    ]
     table = prettytable.PrettyTable(['Route ID', 'Name', 'Operator ID', 'Start Station Name', 'End Station Name'])    
 
     for r in relevant_routes:    
-        table.add_row([r.route_id, r.operator_id, r.start_station_name, r.end_station_name])
+        table.add_row([r.route_id, r.name, r.operator_id, r.start_station_name, r.end_station_name])
     return table
 
 # User stories d)
@@ -42,11 +43,11 @@ def get_routes_between_stations(start_station: str, end_station: str, day_str: s
     search_date = date(year, month, day)
     route_station_times = get_route_station_times()
     routes = get_routes()
-    relevant_routes = list[Route]
+    relevant_routes = []
     for r in routes:
-        all_relevant_rst = list[RouteStationTime]
-        rst_start = Optional[RouteStationTime]
-        rst_end = Optional[RouteStationTime]
+        all_relevant_rst = []
+        rst_start = []
+        rst_end = []
         for rst in route_station_times:
             if rst.route_id == r.route_id:
                 if (rst.station_name == start_station):
@@ -66,27 +67,26 @@ def get_routes_between_stations(start_station: str, end_station: str, day_str: s
             relevant_routes.append(r)
     table = prettytable.PrettyTable(['Route ID', 'Name', 'Operator ID', 'Start Station Name', 'End Station Name'])
     for r in relevant_routes:    
-        table.add_row([r.route_id, r.operator_id, r.start_station_name, r.end_station_name])
+        table.add_row([r.route_id, r.name, r.operator_id, r.start_station_name, r.end_station_name])
     return table
 
 # User stories e)
 def register_customer(customer_number: str, name: str, email: str, mobile_number: str):
-    if customer_number == "" or name == "" or email == "" or mobile_number == "":
+    if not customer_number or not name or not email or not mobile_number:
         error_handler("All fields must have a value")
-    create_customer(customer_number, name, email, mobile_number)    
+    create_customer(customer_number, name, email, mobile_number)
     return "Customer registration finished"
 
 # User stories g part 1)
 def get_available_seats(route_id: str, day_str: str, month_str: str, year_str: str):
-        day = int(day_str)
-        month = int(month_str)
-        year = int(year_str)        
-        check_date_fields(day, month, year)
-        search_date = date(year, month, day)
-        pass
+    day = int(day_str)
+    month = int(month_str)
+    year = int(year_str)
+    check_date_fields(day, month, year)
+    search_date = date(year, month, day)
 
 # User stories g part 2)
-def register_order(customer_id: str, trip_year_str: str, trip_week_nr_str: str, start_station: str, end_station: str, route_id: str, day_str: str, month_str: str, year_str: str, places: list[str]):
+def register_order(customer_id: str, trip_year_str: str, trip_week_nr_str: str, start_station: str, end_station: str, route_id: str, day_str: str, month_str: str, year_str: str, places: list):
     day = int(day_str)
     month = int(month_str)
     year = int(year_str)   
@@ -103,7 +103,7 @@ def register_order(customer_id: str, trip_year_str: str, trip_week_nr_str: str, 
     check_weekday(weekday)
     create_order(order_id, int(customer_id), datetime.now(), year, week_nr, start_station, end_station, int(route_id), weekday)  
     for place in places:
-        # TODO: FIGRE THIS SHIT OUT
+        # TODO: FIGURE THIS SHIT OUT
         create_order_place()  
     
 def get_future_customer_orders(customer_id: str):
@@ -111,7 +111,7 @@ def get_future_customer_orders(customer_id: str):
     route_station_times = get_route_station_times()    
     now = datetime.now()    
     week_nr = now.date.isocalendar()[1]    
-    future_orders = list[Order]
+    future_orders = []
     for o in orders:
         relevant_time = None
         for t in route_station_times:
