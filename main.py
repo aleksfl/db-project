@@ -1,6 +1,8 @@
 import sqlite3
 import os
 from commands import get_all_station_routes, get_routes_between_stations, register_customer, get_available_seats, register_order, get_future_customer_orders
+import colorama
+from colorama import Fore
 
 print('''
       \t**********************************************
@@ -8,40 +10,67 @@ print('''
       \t**********************************************
       ''')
 
-def print_choices() -> None:
-    print('''
-    1. Seperate words by single space
+def print_choices() -> str:
+    print(Fore.YELLOW + '''
+    1. See all routes
 
-    2. get_routes_between_stations start_station end_station day month year
+    2. Get routes between stations
 
-    3. register_customer customer_number name email mobile_number
+    3. Register a customer
 
-    4. get_available_seats route_id day month year"
+    4. See available seats
 
-    5. register_order customer_number start_station end_station route_id day month year place1 place2.
-        For 5. a place consists of the car no. and the place no. joined by a hyphen, i.e carnr-placenr
-        Minimum 1 place
+    5. Register an order
         
-    6. get_customer_orders customer_number
+    6. Get orders by customer
 
-    7. quit
+    7. Quit
             ''')
+    return input(f"{Fore.RED}    Enter number here: ")
+
+def userinput_gco() -> list[str]:
+    return input(f"{Fore.GREEN} Customer Number: "), input(f"{Fore.GREEN} Customer Number: ")
+
+
+def userinput_grbs() -> list[str]:
+    return input(f"{Fore.GREEN} Start Station: "), input(f"{Fore.GREEN} End Station: "), input(f"{Fore.GREEN} Day: "), input(f"{Fore.GREEN} Month: "), input(f"{Fore.GREEN} Year: ")
+
+def userinput_rc() -> list[str]:
+    return input(f"{Fore.GREEN} Customer Number: "), input(f"{Fore.GREEN} Name: "), input(f"{Fore.GREEN} Email: "), input(f"{Fore.GREEN} Mobile No.: ")
+
+def userinput_gas() -> list[str]:
+    return input(f"{Fore.GREEN} Route ID: "), input(f"{Fore.GREEN} Day: "), input(f"{Fore.GREEN} Month: "), input(f"{Fore.GREEN} Year: ")
+
+def userinput_ro() -> list[str]:
+    return input(f"{Fore.GREEN} Start Station: "), input(f"{Fore.GREEN} End Station: ") , input(f"{Fore.GREEN} Route ID: "), input(f"{Fore.GREEN} Day: "), input(f"{Fore.GREEN} Month: "),input(f"{Fore.GREEN} Year: "), input(f"{Fore.GREEN} Place 1: "), input(f"{Fore.GREEN} Place 2: ")
+
+def userinput_gasr() -> list[str]:
+    return input(f"{Fore.GREEN} Customer Number: "), input(f"{Fore.GREEN} Customer Number: ")
+
+
 
 if __name__ == "__main__":
-    print_choices()
-    choice = ""
-    
+    choice = print_choices()
     while choice != "quit":
-        args = choice.split()
-        if choice.lower().startswith("get_all_station_routes"):
-            print(get_all_station_routes(args[1], args[2]))        
-        if choice.lower().startswith("get_routes_between_stations"):
-            print(get_routes_between_stations(args[1], args[2], args[3], args[4], args[5]))
-        if choice.lower().startswith("register_customer"):
-            print(register_customer(args[1], args[2], args[3], args[4]))        
-        if choice.lower().startswith("get_available_seats"):
-            print(get_available_seats(args[1], args[2], args[3], args[4]))    
-        if choice.lower().startswith("register_order"):        
-            print(get_routes_between_stations(args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[7:]))
-        if choice.lower().startswith("get_customer_orders"):        
-            print(get_future_customer_orders(args[1]))
+        if choice == "1":
+            print(Fore.BLUE + get_all_station_routes(*userinput_gasr()))
+            choice = print_choices()
+        if choice == "2":
+            print(Fore.BLUE + get_routes_between_stations(*userinput_grbs))
+            choice = print_choices()
+        if choice == "3":
+            print(Fore.BLUE + register_customer(*userinput_rc()))
+            choice = print_choices()
+        if choice == "4":
+            print(Fore.BLUE + get_available_seats(*userinput_gas()))
+            choice = print_choices()
+        if choice == "5":       
+            print(Fore.BLUE + get_routes_between_stations(*userinput_ro()))
+            choice = print_choices()
+        if choice == "6":        
+            print(get_future_customer_orders(*userinput_gco()))
+            choice = print_choices()
+        if choice.lower() == "quit":
+            quit
+        
+        

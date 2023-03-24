@@ -41,35 +41,35 @@ VALUES
     (
       'Trondheim',
       'Steinkjer',
-      'TrondheimSteinkjer',
+      'Nordlandsbanen',
       120,
       'Double'
     ),
     (
       'Steinkjer',
       'Mosjoen',
-      'SteinkjerMosjoen',
+      'Nordlandsbanen',
       280,
       'Single'
     ),
     (
       'Mosjoen',
       'Moirana',
-      'MosjoenMoirana',
+      'Nordlandsbanen',
       90,
       'Single'
     ),
     (
       'Moirana',
       'Fauske',
-      'MoiranaFauske',
+      'Nordlandsbanen',
       170,
       'Single'
     ),
     (
       'Fauske',
       'Bodo',
-      'FauskeBodo',
+      'Nordlandsbanen',
       60,
       'Single'
     );

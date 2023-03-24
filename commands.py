@@ -1,4 +1,4 @@
-from datetime import date, datetime, now
+from datetime import date, datetime
 import calendar
 import prettytable
 from utils import check_weekday, check_week_nr, check_date_fields, error_handler, valid_weekdays

@@ -13,25 +13,13 @@ VALUES
 INSERT INTO ROUTE_TRACK_TRAVERSAL (RouteID, TrackSectionName, Direction)
 VALUES
     --Day route traversal
-    (1,'TrondheimSteinkjer', 'Main'),
-    (1,'SteinkjerMosjoen','Main'),
-    (1,'MosjoenMoirana','Main'),
-    (1,'MoiranaFauske','Main'),
-    (1,'FauskeBodo','Main'),
+    (1, 'Nordlandsbanen', 'Main'),
 
     --Night route traversal
-    (2,'TrondheimSteinkjer', 'Main'),
-    (2,'SteinkjerMosjoen','Main'),
-    (2,'MosjoenMoirana','Main'),
-    (2,'MoiranaFauske','Main'),
-    (2,'FauskeBodo','Main'),
+    (2, 'Nordlandsbanen', 'Main'),
 
     --Morning route traversal
-    (3,'TrondheimSteinkjer', 'Opposite'),
-    (3,'SteinkjerMosjoen','Opposite'),
-    (3,'MosjoenMoirana','Opposite'),
-    (3,'MoiranaFauske','Opposite'),
-    (3,'FauskeBodo','Opposite');
+    (3, 'Nordlandsbanen', 'Opposite');
 
 
 INSERT INTO ROUTE_WEEKDAY (RouteID, Weekday)
@@ -77,7 +65,7 @@ INSERT INTO ROUTE_STATION_TIME(RouteID, StationName, TimeOfArrival, TimeOfDepart
 VALUES
     (1, 'Trondheim', NULL, '07:49:00'),
     (1, 'Steinkjer', '09:49:00', '09:51:00'),
-    (1, 'Mosjoen2', '13:18:00', '13:20:00'),
+    (1, 'Mosjoen', '13:18:00', '13:20:00'),
     (1, 'Moirana', '14:29:00', '14:31:00'),
     (1, 'Fauske', '16:47:00', '16:49:00'),
     (1, 'Bodo', '17:32:00', NULL),
