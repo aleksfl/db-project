@@ -57,19 +57,19 @@ class RouteStationTime:
         self.station_name = station_name
         self.time_of_arrival = time_of_arrival
         self.time_of_departure = time_of_departure
-        self.is_start = ((time_of_arrival == None) and (time_of_departure != None))
-        self.is_end = ((time_of_departure == None) and (time_of_arrival != None))
+        self.is_start = time_of_arrival is None and time_of_departure != None
+        self.is_end = time_of_departure is None and time_of_arrival != None
         
 def get_route_station_times() -> list[RouteStationTime]:
     con = sqlite3.connect("main.db")
     cur = con.cursor()
-    cur.execute("SELECT * FROM ROUTE_STATION_TIME")    
+    cur.execute("SELECT * FROM ROUTE_STATION_TIME")
     route_station_times = []
     results = cur.fetchall()
     print(f"Fetched {len(results)} route station times")
     for row in results:
-        time_of_arrival == None
-        time_of_departure == None
+        time_of_arrival is None
+        time_of_departure is None
         if row[2] != None:
             time_of_arrival = datetime.strptime(row[2], '%H:%M:%S').time()
         if row[3] != None:
@@ -90,12 +90,13 @@ class Route:
 def get_routes() -> list[Route]:
     con = sqlite3.connect("main.db")
     cur = con.cursor()
-    cur.execute("SELECT * FROM ROUTE")    
-    routes = []
+    cur.execute("SELECT * FROM ROUTE")
     results = cur.fetchall()
     print(f"Fetched {len(results)} routes")
-    for row in results:
-        routes.append(RouteStationTime(row[0], row[1], row[2], row[3], row[4]))
+    routes = [
+        RouteStationTime(row[0], row[1], row[2], row[3], row[4])
+        for row in results
+    ]
     con.close()
     return routes
 
@@ -103,16 +104,13 @@ class RouteWeekday:
     def __init__(self, route_id: int, weekday: str):
         self.route_id = route_id
         self.weekday = weekday
-
 def get_route_weekdays() -> list[RouteWeekday]:
     con = sqlite3.connect("main.db")
     cur = con.cursor()
-    cur.execute("SELECT * FROM ROUTE_WEEKDAY")    
-    route_weekdays = []
+    cur.execute("SELECT * FROM ROUTE_WEEKDAY")
     results = cur.fetchall()
     print(f"Fetched {len(results)} route weekdays")
-    for row in results:
-        route_weekdays.append(RouteWeekday(row[0], row[1]))
+    route_weekdays = [RouteWeekday(row[0], row[1]) for row in results]
     con.close()
     return route_weekdays
 
@@ -124,11 +122,9 @@ class Station:
 def get_stations() -> list[Station]:
     con = sqlite3.connect("main.db")
     cur = con.cursor()
-    cur.execute("SELECT * FROM Station")    
-    stations = []
+    cur.execute("SELECT * FROM Station")
     results = cur.fetchall()
     print(f"Fetched {len(results)} stations")
-    for row in results:
-        stations.append(RouteWeekday(row[0], Decimal(row[1]/10)))
+    stations = [RouteWeekday(row[0], Decimal(row[1]/10)) for row in results]
     con.close()
     return stations
