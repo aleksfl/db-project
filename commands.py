@@ -45,7 +45,7 @@ def get_routes_between_stations(start_station: str, end_station: str, day_str: s
     relevant_routes = list[Route]
     for r in routes:
         all_relevant_rst = list[RouteStationTime]
-        rst_start = Optional[RouteStationTime] 
+        rst_start = Optional[RouteStationTime]
         rst_end = Optional[RouteStationTime]
         for rst in route_station_times:
             if rst.route_id == r.route_id:
@@ -54,10 +54,17 @@ def get_routes_between_stations(start_station: str, end_station: str, day_str: s
                 if (rst.station_name == end_station):
                     rst_end = rst
                 all_relevant_rst.append(rst)
-        if rst_start != None and rst_end != None:
-            if rst_start.is_start or rst_end.is_end or rst_start.time_of_arrival < rst_end.time_of_arrival:
-                relevant_routes.append(r)
-    table = prettytable.PrettyTable(['Route ID', 'Name', 'Operator ID', 'Start Station Name', 'End Station Name'])    
+        if (
+            rst_start != None
+            and rst_end != None
+            and (
+                rst_start.is_start
+                or rst_end.is_end
+                or rst_start.time_of_arrival < rst_end.time_of_arrival
+            )
+        ):
+            relevant_routes.append(r)
+    table = prettytable.PrettyTable(['Route ID', 'Name', 'Operator ID', 'Start Station Name', 'End Station Name'])
     for r in relevant_routes:    
         table.add_row([r.route_id, r.operator_id, r.start_station_name, r.end_station_name])
     return table
