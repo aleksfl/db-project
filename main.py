@@ -1,6 +1,6 @@
 import sqlite3
 import os
-from commands import get_all_station_routes, get_routes_between_stations, register_customer, get_available_seats, register_order, get_customer_orders
+from commands import get_all_station_routes, get_routes_between_stations, register_customer, get_available_seats, register_order, get_future_customer_orders
 
 print('''
       \t**********************************************
@@ -42,5 +42,5 @@ while choice != "quit":
         print(get_available_seats(args[1], args[2], args[3], args[4]))    
     if choice.lower().startswith("register_order"):        
         print(get_routes_between_stations(args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[7:]))
-    if choice.lower().startswith("get_customer_orders"):        
-        print(get_customer_orders(args[1]))
+    if choice.startswith("get_customer_orders"):        
+        print(get_future_customer_orders(args[1]))
