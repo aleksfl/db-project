@@ -68,13 +68,13 @@ def get_route_station_times() -> list[RouteStationTime]:
     results = cur.fetchall()
     print(f"Fetched {len(results)} route station times")
     for row in results:
-        time_of_arrival is None
-        time_of_departure is None
+        time_of_arrival = None
+        time_of_departure = None
         if row[2] != None:
             time_of_arrival = datetime.strptime(row[2], '%H:%M:%S').time()
         if row[3] != None:
             time_of_departure = datetime.strptime(row[3], '%H:%M:%S').time()
-        route_station_time = RouteStationTime(row[0], row[1], row[2], row[3])
+        route_station_time = RouteStationTime(row[0], row[1], time_of_arrival, time_of_departure)
         route_station_times.append(route_station_time)
     con.close()
     return route_station_times
@@ -128,3 +128,21 @@ def get_stations() -> list[Station]:
     stations = [RouteWeekday(row[0], Decimal(row[1]/10)) for row in results]
     con.close()
     return stations
+
+class OrderPlace:
+    def __init__(self, order_id: int, car_type_name: str, place_no: int, car_no: int):
+        self.order_id = order_id
+        self.car_type_name = car_type_name
+        self.place_no = place_no
+        self.car_no = car_no
+
+def read_order_places():
+    conn = sqlite3.connect("train.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM ORDER_PLACE")
+    results = cursor.fetchall()
+    print(f"Fetched {len(results)} order places")
+    order_places = [RouteWeekday(row[0], row[1], row[2], row[3]) for row in results]
+    conn.close()
+    return order_places
