@@ -42,5 +42,5 @@ while choice != "quit":
         print(get_available_seats(args[1], args[2], args[3], args[4]))    
     if choice.lower().startswith("register_order"):        
         print(get_routes_between_stations(args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[7:]))
-    if choice.startswith("get_customer_orders"):        
+    if choice.lower().startswith("get_customer_orders"):        
         print(get_future_customer_orders(args[1]))
