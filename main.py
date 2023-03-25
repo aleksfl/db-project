@@ -28,6 +28,14 @@ def print_choices() -> str:
             ''')
     return input(f"{Fore.RED}    Enter number here: ")
 
+
+
+"""
+
+    Input function for the user interface
+
+"""
+
 def userinput_gco() -> list[str]:
     return input(f"{Fore.GREEN} Customer Number: ")
 
@@ -36,7 +44,7 @@ def userinput_grbs() -> list[str]:
     return input(f"{Fore.GREEN} Start Station: "), input(f"{Fore.GREEN} End Station: "), input(f"{Fore.GREEN} Day: "), input(f"{Fore.GREEN} Month: "), input(f"{Fore.GREEN} Year: ")
 
 def userinput_rc() -> list[str]:
-    return input(f"{Fore.GREEN} Customer Number: "), input(f"{Fore.GREEN} Name: "), input(f"{Fore.GREEN} Email: "), input(f"{Fore.GREEN} Mobile No.: ")
+    return input(f"{Fore.GREEN} Name: "), input(f"{Fore.GREEN} Email: "), input(f"{Fore.GREEN} Mobile No.: ")
 
 def userinput_gas() -> list[str]:
     return input(f"{Fore.GREEN} Route ID: "), input(f"{Fore.GREEN} Day: "), input(f"{Fore.GREEN} Month: "), input(f"{Fore.GREEN} Year: "), input(f"{Fore.GREEN} Start Station: "), input(f"{Fore.GREEN} End Station: ")
@@ -56,7 +64,12 @@ def userinput_ro() -> list[str]:
 def userinput_gasr() -> list[str]:
     return input(f"{Fore.GREEN} Station: "), input(f"{Fore.GREEN} Weekday: ")
 
-test_sas = ["1", "1", "1", "2024", "Trondheim", "Steinkjer"]
+
+"""
+
+    Main entry point 
+
+"""
 
 if __name__ == "__main__":
     choice = print_choices()
