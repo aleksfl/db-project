@@ -3,14 +3,15 @@ import calendar
 import prettytable
 import uuid
 from utils import check_weekday, check_week_nr, check_date_fields, error_handler, valid_weekdays
-from db_access import create_customer, create_order, get_all_orders_by_customer, get_route_station_times, Order, Route, RouteStationTime, RouteWeekday, OrderPlace, ArrangedCar, Place, get_routes, get_route_weekdays, get_stations, get_order_places, get_order_places_by_order, get_arranged_cars_by_route, get_places, get_orders
+from db_access import create_customer, create_order, get_all_orders_by_customer, get_route_station_times, Order, Route, RouteStationTime, RouteWeekday, OrderPlace, ArrangedCar, Place, get_routes, get_route_weekdays, get_stations, get_order_places, get_order_places_by_order, get_arranged_cars_by_route, get_places, get_orders, create_order_place
 from typing import Optional
 # User stories c)
 def get_all_station_routes(station: str, weekday: str):
     # Ensure only first letter in weekday is capitalized
     station = str.capitalize(str.lower(station))
     weekday = str.capitalize(str.lower(weekday))
-    check_weekday(weekday)
+    if not check_weekday(weekday): 
+        return "Failed"
     all_routes = get_routes()
     route_weekdays = get_route_weekdays()
     route_station_times = get_route_station_times()
@@ -40,8 +41,9 @@ def get_all_station_routes(station: str, weekday: str):
 def get_routes_between_stations(start_station: str, end_station: str, day_str: str, month_str: str, year_str: str):
     day = int(day_str)
     month = int(month_str)
-    year = int(year_str)
-    check_date_fields(day, month, year)
+    year = int(year_str)    
+    if not check_date_fields(day, month, year): 
+        return "Failed"
     search_date = date(year, month, day)
     weekday1 = search_date.weekday
     search_date = search_date + timedelta(days=1)
@@ -109,6 +111,7 @@ def get_routes_between_stations(start_station: str, end_station: str, day_str: s
 def register_customer(customer_number: str, name: str, email: str, mobile_number: str):
     if not customer_number or not name or not email or not mobile_number:
         error_handler("All fields must have a value")
+        return "Failed"
     create_customer(customer_number, name, email, mobile_number)
     return "Customer registration finished"
 
@@ -117,7 +120,8 @@ def get_available_places(route_id: str, day_str: str, month_str: str, year_str: 
     day = int(day_str)
     month = int(month_str)
     year = int(year_str)
-    check_date_fields(day, month, year)
+    if not check_date_fields(day, month, year): 
+        return "Failed"
     search_date = date(year, month, day)
     week_nr = search_date.date.isocalendar()[1]
     weekday = calendar.day_name[search_date.weekday()]
@@ -144,20 +148,22 @@ def get_available_places(route_id: str, day_str: str, month_str: str, year_str: 
             available_places.append(p)
     return available_places
 
-def print_available_seats(route_id: str, day_str: str, month_str: str, year_str: str):
-    available_seats = get_available_places(route_id, day_str, month_str, year_str)
+def print_available_places(route_id: str, day_str: str, month_str: str, year_str: str):
+    available_places = get_available_places(route_id, day_str, month_str, year_str)
     table = prettytable.PrettyTable(['Car No', 'Place No'])
-    for s in available_seats:
-        items = s.split('-')
+    for p in available_places:
+        items = p.split('-')
         table.add_row(items)   
     return table
 
 # User stories g part 2)
-def register_order(customer_id: str, trip_year_str: str, trip_week_nr_str: str, start_station: str, end_station: str, route_id: str, day_str: str, month_str: str, year_str: str, places: list):
+def register_order(customer_id: str, start_station: str, end_station: str, route_id: str, day_str: str, month_str: str, year_str: str, places_str: str):
+    places = places_str.split()
     day = int(day_str)
     month = int(month_str)
     year = int(year_str)   
-    check_date_fields(day, month, year)
+    if not check_date_fields(day, month, year): 
+        return "Failed"
     route_date = datetime(year, month, day)
     week_nr = route_date.date.isocalendar()[1]
     weekday = calendar.day_name[route_date.weekday()]
@@ -168,20 +174,26 @@ def register_order(customer_id: str, trip_year_str: str, trip_week_nr_str: str, 
     while order_id != "" and order_id not in order_ids:
         order_id = str(uuid.uuid1()).split('-')[0]    
     start_station = str.capitalize(str.lower(start_station))
-    end_station = str.capitalize(str.lower(end_station))
-    check_date_fields(1, 1, year)
-    check_week_nr(week_nr)
-    check_weekday(weekday)
+    end_station = str.capitalize(str.lower(end_station))    
+    if not check_week_nr(week_nr) or not check_weekday(weekday): 
+        return "Failed"        
 
-    available_seats = get_available_places()
+    available_seats = get_available_places(route_id, day_str, month_str, year_str)
     for p in places:
         if p not in available_seats:
-            error_handler(f"Place{}")
-
+            error_handler(f"Place {p} is already booked.")
+            return "Failed"                    
+    arranged_cars = get_arranged_cars_by_route(route_id)
+    car_type_names = dict[int, str]
+    for a in arranged_cars:
+        car_type_names[a.number] = a.car_type_name
     create_order(order_id, int(customer_id), datetime.now(), year, week_nr, start_station, end_station, int(route_id), weekday)  
-    for place in places:
-        # TODO: FIGURE THIS SHIT OUT
-        create_order_place()  
+    for p in places:        
+        fields = p.split('-')
+        car_no = fields[0]
+        place_no = fields[1]
+        create_order_place(order_id, car_type_names[car_no], place_no, car_no)  
+    return (f"Registered order with id: {order_id} for places: {', '.join(places)}")
     
 def get_future_customer_orders(customer_id: str):
     orders = get_all_orders_by_customer(int(customer_id))        
