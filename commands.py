@@ -3,8 +3,7 @@ import calendar
 import prettytable
 import uuid
 from utils import check_weekday, check_week_nr, check_date_fields, error_handler, valid_weekdays
-from db_access import create_customer, create_order, get_all_orders_by_customer, get_route_station_times, Order, Route, RouteStationTime, RouteWeekday, OrderPlace, ArrangedCar, Place, get_routes, get_route_weekdays, get_stations, get_order_places, get_order_places_by_order, get_arranged_cars_by_route, get_places, get_orders, create_order_place
-from typing import Optional
+from db_access import create_customer, create_order, get_all_orders_by_customer, get_route_station_times, get_routes, get_route_weekdays, get_order_places_by_order, get_arranged_cars_by_route, get_places, get_orders
 # User stories c)
 def get_all_station_routes(station: str, weekday: str):
     # Ensure only first letter in weekday is capitalized
@@ -39,6 +38,7 @@ def get_all_station_routes(station: str, weekday: str):
 
 # User stories d)
 def get_routes_between_stations(start_station: str, end_station: str, day_str: str, month_str: str, year_str: str):
+    # sourcery skip: low-code-quality
     day = int(day_str)
     month = int(month_str)
     year = int(year_str)    

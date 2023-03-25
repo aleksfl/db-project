@@ -1,7 +1,6 @@
 import sqlite3
 import os
-from commands import get_all_station_routes, get_routes_between_stations, register_customer, get_available_seats, register_order, get_future_customer_orders
-import colorama
+from commands import get_all_station_routes, get_routes_between_stations, register_customer, get_available_places, register_order, get_future_customer_orders
 from colorama import Fore
 
 print('''
@@ -69,7 +68,7 @@ if __name__ == "__main__":
             print(Fore.BLUE + register_customer(*userinput_rc()))
             choice = print_choices()
         if choice == "4":
-            print(Fore.BLUE + get_available_seats(*userinput_gas()))
+            print(Fore.BLUE + get_available_places(*userinput_gas()))
             choice = print_choices()
         if choice == "5":       
             print(Fore.BLUE + register_order(*userinput_ro()))
