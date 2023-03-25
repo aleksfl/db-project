@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, time, datetime, timedelta
 import calendar
 import prettytable
 from utils import check_weekday, check_week_nr, check_date_fields, error_handler, valid_weekdays
@@ -15,12 +15,13 @@ def get_all_station_routes(station: str, weekday: str):
     route_station_times = get_route_station_times()
     routes_that_run_on_weekday = []
     routes_that_pass_station = []
-
+    arrival_times = dict[int, time]
     for r in route_weekdays:
         if r.route_id not in routes_that_run_on_weekday and r.weekday == weekday:
             routes_that_run_on_weekday.append(r.route_id)
     for r in route_station_times:
         if (r.route_id not in routes_that_pass_station and r.station_name == station):
+            arrival_times[r.route_id] = r.time_of_arrival
             routes_that_pass_station.append(r.route_id)
     relevant_routes = [
         r
@@ -28,10 +29,10 @@ def get_all_station_routes(station: str, weekday: str):
         if r.route_id in routes_that_run_on_weekday
         and r.route_id in routes_that_pass_station
     ]
-    table = prettytable.PrettyTable(['Route ID', 'Name', 'Operator ID', 'Start Station Name', 'End Station Name'])    
+    table = prettytable.PrettyTable(['Route ID', 'Name', 'Operator ID', 'Start Station Name', 'End Station Name', 'Time Of Arrival At Station'])    
 
     for r in relevant_routes:    
-        table.add_row([r.route_id, r.name, r.operator_id, r.start_station_name, r.end_station_name])
+        table.add_row([r.route_id, r.name, r.operator_id, r.start_station_name, r.end_station_name, arrival_times[r.route_id]])
     return table
 
 # User stories d)
@@ -41,9 +42,31 @@ def get_routes_between_stations(start_station: str, end_station: str, day_str: s
     year = int(year_str)
     check_date_fields(day, month, year)
     search_date = date(year, month, day)
+    weekday1 = search_date.weekday
+    search_date = search_date + timedelta(days=1)
+    weekday2 = search_date.weekday    
     route_station_times = get_route_station_times()
+    route_weekdays = get_route_weekdays()
+    routes_on_days = []
+    routes_day_1 = []
+    routes_day_2 = []
     routes = get_routes()
-    relevant_routes = []
+    for r in routes:
+        if r.route_id not in routes_on_days:
+            for rw in route_weekdays:
+                if rw.route_id == r.route_id:
+                    weekday_int = valid_weekdays.index(rw.weekday)
+                    on_relevant_day = False
+                    if (weekday1 == weekday_int):
+                        routes_day_1.append(r.route_id)
+                        on_relevant_day = True
+                    if (weekday2 == weekday_int):
+                        routes_day_2.append(r.route_id)
+                        on_relevant_day = True
+                    if rw.route_id not in routes_on_days:                                            
+                        if on_relevant_day:
+                            routes_on_days.append(r.route_id)                            
+    routes_between_stations = []
     for r in routes:
         all_relevant_rst = []
         rst_start = []
@@ -64,10 +87,21 @@ def get_routes_between_stations(start_station: str, end_station: str, day_str: s
                 or rst_start.time_of_arrival < rst_end.time_of_arrival
             )
         ):
-            relevant_routes.append(r)
-    table = prettytable.PrettyTable(['Route ID', 'Name', 'Operator ID', 'Start Station Name', 'End Station Name'])
+            routes_between_stations.append(r)
+    table = prettytable.PrettyTable(['Route ID', 'Name', 'Operator ID', 'Start Station Name', 'End Station Name', 'Weekdays'])
+    relevant_routes = [
+        r
+        for r in routes
+        if r.route_id in routes_on_days
+        and r.route_id in routes_between_stations
+    ]    
     for r in relevant_routes:    
-        table.add_row([r.route_id, r.name, r.operator_id, r.start_station_name, r.end_station_name])
+        days = ""
+        if (r.route_id in routes_day_1):
+            days = " " + valid_weekdays[weekday1]
+        if (r.route_id in routes_day_2):
+            days = " " + valid_weekdays[weekday2]
+        table.add_row([r.route_id, r.name, r.operator_id, r.start_station_name, r.end_station_name, days])
     return table
 
 # User stories e)
