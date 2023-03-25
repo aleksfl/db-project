@@ -23,4 +23,4 @@ VALUES
     ('SJ-sleeping car-1', 5),
     ('SJ-sleeping car-1', 6),
     ('SJ-sleeping car-1', 7),
-    ('SJ-sleeping car-1', 8),
+    ('SJ-sleeping car-1', 8);
