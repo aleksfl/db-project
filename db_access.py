@@ -41,8 +41,22 @@ def get_all_orders_by_customer(customer_id: int) -> list[Order]:
     cur.execute(query, (customer_id,))    
     results = cur.fetchall()
     con.close()
-    print(f"Fetched {len(results)} orders for customer {customer_id}")
-    # Convert the results into a list of Order objects
+    print(f"Fetched {len(results)} orders for customer {customer_id}")    
+    orders = []
+    for row in results:
+        order = Order(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8])
+        orders.append(order)
+
+    # Return the list of Order objects
+    return orders
+
+def get_orders() -> list[Order]:
+    con = sqlite3.connect("main.db")
+    cur = con.cursor()    
+    cur.execute('SELECT * FROM CUSTOMER_ORDER')    
+    results = cur.fetchall()
+    con.close()
+    print(f"Fetched {len(results)} orders")    
     orders = []
     for row in results:
         order = Order(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8])
@@ -123,7 +137,7 @@ def get_stations() -> list[Station]:
     cur.execute("SELECT * FROM Station")
     results = cur.fetchall()
     print(f"Fetched {len(results)} stations")
-    stations = [RouteWeekday(row[0], Decimal(row[1]/10)) for row in results]
+    stations = [Station(row[0], Decimal(row[1]/10)) for row in results]
     con.close()
     return stations
 
@@ -134,23 +148,56 @@ class OrderPlace:
         self.place_no = place_no
         self.car_no = car_no
 
-def get_order_places():
+def get_order_places() -> list[OrderPlace]:
     conn = sqlite3.connect("train.db")
     cursor = conn.cursor()
 
     cursor.execute("SELECT * FROM ORDER_PLACE")
     results = cursor.fetchall()
     print(f"Fetched {len(results)} order places")
-    order_places = [RouteWeekday(row[0], row[1], row[2], row[3]) for row in results]
+    order_places = [OrderPlace(row[0], row[1], row[2], row[3]) for row in results]
     conn.close()
     return order_places
 
-def get_order_places_by_order(order_id: int):
+def get_order_places_by_order(order_id: int) -> list[OrderPlace]:
     conn = sqlite3.connect("train.db")
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM ORDER_PLACE WHERE OrderID = ?", (order_id))
     results = cursor.fetchall()
     print(f"Fetched {len(results)} order places for order id {order_id}")
-    order_places = [RouteWeekday(row[0], row[1], row[2], row[3]) for row in results]
+    order_places = [OrderPlace(row[0], row[1], row[2], row[3]) for row in results]
     conn.close()
     return order_places
+
+class Place:
+    def __init__(self, car_type_name: str, place_no: int):        
+        self.car_type_name = car_type_name
+        self.place_no = place_no        
+
+def get_places() -> list[Place]:
+    conn = sqlite3.connect("train.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM PLACE")
+    results = cursor.fetchall()
+    print(f"Fetched {len(results)} car places")
+    places = [Place(row[0], row[1]) for row in results]
+    conn.close()
+    return places
+
+class ArrangedCar:
+    def __init__(self, route_id: int, number: int, car_type_name: str):        
+        self.route_id = route_id
+        self.number = number
+        self.car_type_name = car_type_name               
+
+def get_arranged_cars_by_route(route_id: int) -> list[ArrangedCar]:
+    conn = sqlite3.connect("train.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM ARRANGED_CAR WHERE RouteID = ?", (route_id))
+    results = cursor.fetchall()
+    print(f"Fetched {len(results)} arranged cars for route id {route_id}")
+    places = [ArrangedCar(row[0], row[1], row[1]) for row in results]
+    conn.close()
+    return places
