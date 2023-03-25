@@ -404,7 +404,7 @@ class ArrangedCar:
     """  
     def __init__(self, route_id: int, number: int, car_type_name: str):
         """
-            Fetches all the places registered in the database
+            Fetches all the ArrangedCars registered in the database
             
             :param route_id: The primary key of the ROUTE-table
             :param number: The order of the car in the car-setting/layout i.e. 1 is the first car...
