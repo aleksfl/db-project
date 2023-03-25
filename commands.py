@@ -119,10 +119,12 @@ def get_routes_between_stations(start_station: str, end_station: str, day_str: s
         if r.route_id in routes_on_days and r.route_id in routes_between_stations:
             relevant_routes[r.route_id] = r    
     route_times = {}
+    print(relevant_routes.keys())
     for r in relevant_routes.values():
         for rst in route_station_times:        
-            if (rst.route_id == r.route_id and rst.station_name == start_station):
+            if (rst.route_id == r.route_id and rst.station_name == start_station and not rst.is_end):
                 route_times[r.route_id] = rst.time_of_departure
+
     sorted(route_times.items(), key=lambda x: x[1])
     for r in route_times.keys():    
         days = ""
@@ -350,6 +352,17 @@ def get_future_customer_orders(customer_id: str):
     week_nr = now.date().isocalendar()[1]    
     future_orders = []
     order_place_str = {}
+    is_sleeping = {}
+    car_types = get_car_types()
+    for o in orders:
+        for a in get_arranged_cars_by_route(o.route_id):
+            for c in car_types:            
+                if (a.car_type_name == c.name):
+                    key = (str(o.route_id) + "-" + str(a.number))
+                    if c.type == "Sleeping":
+                        is_sleeping[key] = "Bed"
+                    else:
+                        is_sleeping[key] = "Chair"
     for o in orders:
         relevant_time = None
         for t in route_station_times:
@@ -369,10 +382,9 @@ def get_future_customer_orders(customer_id: str):
         places = get_order_places_by_order(o.order_id)
         place_str = ""
         for p in places:
-            place_str = place_str + " " + str(p.car_no) + "-" + str(p.place_no)
+            place_str = place_str + " " + str(p.car_no) + "-" + str(p.place_no) + "-" + is_sleeping[(str(o.route_id) + "-" + str(p.car_no))]
         order_place_str[o.order_id] = place_str
-    table = prettytable.PrettyTable(['Order ID', 'Customer ID', 'Purchase DateTime', 'Trip Year', 'Trip Week Nr', 'Start Station Name', 'End Station Name', 'Route ID', 'Weekday', 'Places (CarNo-PlaceNo)'])    
-
+    table = prettytable.PrettyTable(['Order ID', 'Customer ID', 'Purchase DateTime', 'Trip Year', 'Trip Week Nr', 'Start Station Name', 'End Station Name', 'Route ID', 'Weekday', 'Places (CarNo-PlaceNo)'])        
     for order in future_orders:
         table.add_row([order.order_id, order.customer_id, order.datetime, order.trip_year, order.trip_week_nr, order.start_station_name, order.end_station_name, order.route_id, order.weekday, order_place_str[o.order_id]])
     return table
