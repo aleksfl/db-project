@@ -229,4 +229,3 @@ def get_future_customer_orders(customer_id: str):
         table.add_row([order.order_id, order.customer_id, order.datetime, order.trip_year, order.trip_week_nr, order.start_station_name, order.end_station_name, order.route_id, order.weekday, order_place_str[o.order_id]])
     return table
     
-
