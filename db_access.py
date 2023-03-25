@@ -5,23 +5,37 @@ from decimal import Decimal
 
 DB_PATH = "train.db"
 
-def create_customer(id:str, name: str, email: str, phone_no: str):
+def create_customer(name: str, email: str, phone_no: str):
+    """
+    Creates a customer entity in the database
+
+    :param route_id: The primary key of the route table
+    :param station_name: Name of the station
+    :param time_of_arrival: Arrival time of the train
+    :param time_of_departure: Departure time of the train
+    
+    :return: returns nothing
+    """
     con = sqlite3.connect(DB_PATH)
     cur = con.cursor()
-    query = "INSERT INTO CUSTOMER (CustomerId, Name, Email, PhoneNo) VALUES (?, ?, ?, ?)"
-    cur.execute(query, (id, name, email, phone_no))
+    query = "INSERT INTO CUSTOMER (Name, Email, PhoneNo) VALUES (?, ?, ?)"
+    cur.execute(query, (name, email, phone_no))
+    customer_id = cur.lastrowid
     con.commit()
     con.close()
-    print(f"Inserted customer {name} with email {email} and phone number {phone_no} into the database.")
+    print(f"Inserted customer with id {customer_id} and name {name} with email {email} and phone number {phone_no} into the database.")
+    return customer_id
 
-def create_order(order_id: int, customer_id: int, date_time: datetime, trip_year: int, trip_week_nr: int, start_station_name: str, end_station_name: str, route_id: int, weekday: str):
+def create_order(customer_id: int, date_time: datetime, trip_year: int, trip_week_nr: int, start_station_name: str, end_station_name: str, route_id: int, weekday: str):
     con = sqlite3.connect(DB_PATH)
     cur = con.cursor()
-    query = "INSERT INTO CUSTOMER_ORDER (OrderID, CustomerID, DateTime, TripYear, TripWeekNr, StartStationName, EndStationName, RouteID, Weekday) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
-    cur.execute(query, (order_id, customer_id, date_time, trip_year, trip_week_nr, start_station_name, end_station_name, route_id, weekday))
+    query = "INSERT INTO CUSTOMER_ORDER (CustomerID, DateTime, TripYear, TripWeekNr, StartStationName, EndStationName, RouteID, Weekday) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+    cur.execute(query, (customer_id, date_time, trip_year, trip_week_nr, start_station_name, end_station_name, route_id, weekday))
+    order_id = cur.lastrowid
     con.commit()
     con.close()
     print(f"Inserted order with ID {order_id} for customer with ID {customer_id} for trip from {start_station_name} to {end_station_name} on {weekday}, year {trip_year}, week {trip_week_nr} into the database.")        
+    return order_id
 
 class Order:
     def __init__(self, order_id: int, customer_id: int, date_time: datetime, trip_year: int, trip_week_nr: int, start_station_name: str, end_station_name: str, route_id: int, weekday: str):
@@ -67,7 +81,20 @@ def get_orders() -> list[Order]:
     return orders
 
 class RouteStationTime:
+    """
+        RouteStationTime is creating a object to keep track of the respective instances in the SQLite database.
+    """
     def __init__(self, route_id: int, station_name: str, time_of_arrival: Optional[time], time_of_departure: Optional[time]):
+        """
+        Constructs a RouteStationTime Object
+
+        :param route_id: The primary key of the route table
+        :param station_name: Name of the station
+        :param time_of_arrival: Arrival time of the train
+        :param time_of_departure: Departure time of the train
+        
+        :return: returns nothing
+        """
         self.route_id = route_id
         self.station_name = station_name
         self.time_of_arrival = time_of_arrival
@@ -182,7 +209,7 @@ def get_order_places() -> list[OrderPlace]:
 def get_order_places_by_order(order_id: int) -> list[OrderPlace]:
     con = sqlite3.connect(DB_PATH)
     cursor = con.cursor()
-    cursor.execute("SELECT * FROM ORDER_PLACE WHERE OrderID = ?", (order_id))
+    cursor.execute("SELECT * FROM ORDER_PLACE WHERE OrderID = ?", (order_id, ))
     results = cursor.fetchall()
     print(f"Fetched {len(results)} order places for order id {order_id}")
     order_places = [OrderPlace(row[0], row[1], row[2], row[3]) for row in results]

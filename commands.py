@@ -113,12 +113,12 @@ def get_routes_between_stations(start_station: str, end_station: str, day_str: s
     return table
 
 # User stories e)
-def register_customer(customer_number: str, name: str, email: str, mobile_number: str):
-    if customer_number == "" or name == "" or email == "" or mobile_number == "":
+def register_customer(name: str, email: str, mobile_number: str):
+    if name == "" or email == "" or mobile_number == "":
         error_handler("All fields must have a value")
         return "Failed"
-    create_customer(customer_number, name, email, mobile_number)
-    return "Customer registration finished"
+    customer_id = create_customer(name, email, mobile_number)
+    return f"Customer registration for customer: {customer_id} finished"
 
 def get_stations_on_route(route_id: str) -> list[str]:
     station_times = get_route_station_times_by_route(int(route_id))
@@ -162,9 +162,9 @@ def get_available_places(route_id: str, day_str: str, month_str: str, year_str: 
     end_index = route_stations.index(end_station)
     relevant_orders = []
     for o in orders:
-        route_stations.index(o.end_station_name) < start_index
-        if o.weekday == weekday and o.trip_week_nr == week_nr and o.trip_year == year and end_index > route_stations.index(o.start_station_name):
-            relevant_orders.append(o.order_id)
+        
+        if (o.weekday == weekday and o.trip_week_nr == week_nr and o.trip_year == year) and not (end_index <= route_stations.index(o.start_station_name)):
+            relevant_orders.append(o)
     places = get_places()
     all_route_places = []
     for a in arranged_cars:
@@ -178,10 +178,11 @@ def get_available_places(route_id: str, day_str: str, month_str: str, year_str: 
         for p in order_places:
             if is_sleeping[p.car_no] or not (route_stations.index(o.end_station_name) <= start_index):
                 ordered_places.append(str(p.car_no) + "-" + str(p.place_no))
-                if ((p.place_no % 2) == 0):
-                    ordered_places.append(str(p.car_no) + "-" + str(p.place_no - 1))
-                else:
-                    ordered_places.append(str(p.car_no) + "-" + str(p.place_no + 1))
+                if (is_sleeping[p.car_no]):
+                    if ((p.place_no % 2) == 0):
+                        ordered_places.append(str(p.car_no) + "-" + str(p.place_no - 1))
+                    else:
+                        ordered_places.append(str(p.car_no) + "-" + str(p.place_no + 1))
 
     available_places = []    
     for p in all_route_places:
@@ -204,7 +205,7 @@ def print_available_places(route_id: str, day_str: str, month_str: str, year_str
     return table
 
 # User stories g part 2)
-def register_order(start_station: str, end_station: str, route_id: str, day_str: str, month_str: str, year_str: str, places_str: str):
+def register_order(customer_id: str, start_station: str, end_station: str, route_id: str, day_str: str, month_str: str, year_str: str, places_str: str):
     places = places_str.split()
     day = int(day_str)
     month = int(month_str)
@@ -220,13 +221,13 @@ def register_order(start_station: str, end_station: str, route_id: str, day_str:
     if check_week_nr(week_nr) == False or check_weekday(weekday) == False: 
         return "Failed"        
 
-    available_seats = get_available_places(route_id, day_str, month_str, year_str, start_station, end_station)    
+    available_seats_with_type = get_available_places(route_id, day_str, month_str, year_str, start_station, end_station)    
+    available_seats = []
+    for a in available_seats_with_type:
+        items = a.split('-')
+        available_seats.append(items[0] + '-' + items[1])
     for p in places:
-        availabe = False
-        for a in available_seats:
-            if a.startswith(p):
-                availabe = True
-        if availabe == False:
+        if p not in available_seats:
             error_handler(f"Place {p} is already booked.")
             return "Failed"                    
     arranged_cars = get_arranged_cars_by_route(route_id)
@@ -239,12 +240,12 @@ def register_order(start_station: str, end_station: str, route_id: str, day_str:
     car_type_names = {}
     for a in arranged_cars:
         car_type_names[a.number] = a.car_type_name
-    create_order(order_id, int(customer_id), datetime.now(), year, week_nr, start_station, end_station, int(route_id), weekday)  
+    order_id = create_order(int(customer_id), datetime.now(), year, week_nr, start_station, end_station, int(route_id), weekday)  
     for p in places:        
         fields = p.split('-')
         car_no = fields[0]
         place_no = fields[1]
-        create_order_place(order_id, car_type_names[car_no], place_no, car_no)  
+        create_order_place(order_id, car_type_names[int(car_no)], int(place_no), int(car_no))  
     return (f"Registered order with id: {order_id} for places: {', '.join(places)}")
     
 def get_future_customer_orders(customer_id: str):
@@ -273,7 +274,7 @@ def get_future_customer_orders(customer_id: str):
         places = get_order_places_by_order(o.order_id)
         place_str = ""
         for p in places:
-            place_str = place_str + " " + p.car_no + "-" + p.place_no
+            place_str = place_str + " " + str(p.car_no) + "-" + str(p.place_no)
         order_place_str[o.order_id] = place_str
     table = prettytable.PrettyTable(['Order ID', 'Customer ID', 'Purchase DateTime', 'Trip Year', 'Trip Week Nr', 'Start Station Name', 'End Station Name', 'Route ID', 'Weekday', 'Places (CarNo-PlaceNo)'])    
 
