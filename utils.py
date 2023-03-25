@@ -1,5 +1,9 @@
 valid_weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
+"""
+    A Set of validators the handle errors
+"""
+
 def error_handler(msg: str):
     print("The following error occured with your query: " + msg)    
 
