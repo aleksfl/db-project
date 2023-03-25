@@ -49,16 +49,8 @@ VALUES
 
 INSERT INTO CAR_TYPE(Name, Type, NoRows, NoSeatsInRow, NoCompartments)
 VALUES
-    --Day route arrangement
     ('SJ-chair car-1', 'Seating', 3, 4, NULL),
-    ('SJ-chair car-2', 'Seating', 3, 4, NULL),
-
-    --Night route arrangement
-    ('SJ-chair car-3', 'Seating', 3, 4, NULL),
-    ('SJ-sleeping car-1', 'Sleeping', NULL, NULL, 4),
-
-    --Morning route arrangement
-    ('SJ-chair car-4', 'Seating', 3, 4, NULL);
+    ('SJ-sleeping car-1', 'Sleeping', NULL, NULL, 4);
 
 
 INSERT INTO ROUTE_STATION_TIME(RouteID, StationName, TimeOfArrival, TimeOfDeparture)
@@ -86,10 +78,10 @@ VALUES
 INSERT INTO ARRANGED_CAR(RouteID, Number, CarTypeName)
 VALUES
     (1, 1, 'SJ-chair car-1'),
-    (1, 2, 'SJ-chair car-2'),
+    (1, 2, 'SJ-chair car-1'),
 
-    (2, 1, 'SJ-chair car-3'),
+    (2, 1, 'SJ-chair car-1'),
     (2, 2, 'SJ-sleeping car-1'),
 
-    (3, 1, 'SJ-chair car-4');
+    (3, 1, 'SJ-chair car-1');
 
