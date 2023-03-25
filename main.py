@@ -1,6 +1,7 @@
 import sqlite3
 import os
-from commands import get_all_station_routes, get_routes_between_stations, register_customer, get_available_places, register_order, get_future_customer_orders
+from commands import get_all_station_routes, get_routes_between_stations, print_available_places, register_customer, get_available_places, register_order, get_future_customer_orders
+import colorama
 from colorama import Fore
 
 print('''
@@ -11,13 +12,13 @@ print('''
 
 def print_choices() -> str:
     print(Fore.YELLOW + '''
-    1. See all routes
+    1. See all routes for a station
 
     2. Get routes between stations
 
     3. Register a customer
 
-    4. See available seats
+    4. See available places
 
     5. Register an order
         
@@ -28,7 +29,7 @@ def print_choices() -> str:
     return input(f"{Fore.RED}    Enter number here: ")
 
 def userinput_gco() -> list[str]:
-    return input(f"{Fore.GREEN} Customer Number: "), input(f"{Fore.GREEN} Customer Number: ")
+    return input(f"{Fore.GREEN} Customer Number: ")
 
 
 def userinput_grbs() -> list[str]:
@@ -38,22 +39,24 @@ def userinput_rc() -> list[str]:
     return input(f"{Fore.GREEN} Customer Number: "), input(f"{Fore.GREEN} Name: "), input(f"{Fore.GREEN} Email: "), input(f"{Fore.GREEN} Mobile No.: ")
 
 def userinput_gas() -> list[str]:
-    return input(f"{Fore.GREEN} Route ID: "), input(f"{Fore.GREEN} Day: "), input(f"{Fore.GREEN} Month: "), input(f"{Fore.GREEN} Year: ")
+    return input(f"{Fore.GREEN} Route ID: "), input(f"{Fore.GREEN} Day: "), input(f"{Fore.GREEN} Month: "), input(f"{Fore.GREEN} Year: "), input(f"{Fore.GREEN} Start Station: "), input(f"{Fore.GREEN} End Station: ")
 
 def userinput_ro() -> list[str]:
-    places = int(input(f"{Fore.GREEN} How many places do you want to book for this order?: "))
     return (
+        input(f"{Fore.GREEN} CustomerID: "),
         input(f"{Fore.GREEN} Start Station: "),
         input(f"{Fore.GREEN} End Station: "),
         input(f"{Fore.GREEN} Route ID: "),
         input(f"{Fore.GREEN} Day: "),
         input(f"{Fore.GREEN} Month: "),
-        [input(f" Place {i} (Write on the format: <CarNo-PlaceNo>): ") for i in range(places)],
+        input(f"{Fore.GREEN} Year: "),
+        input(f"{Fore.GREEN} Seats <CarNo-PlaceNo> seperated by space: "),
     )
-
 
 def userinput_gasr() -> list[str]:
     return input(f"{Fore.GREEN} Station: "), input(f"{Fore.GREEN} Weekday: ")
+
+test_sas = ["1", "1", "1", "2024", "Trondheim", "Steinkjer"]
 
 if __name__ == "__main__":
     choice = print_choices()
@@ -65,18 +68,19 @@ if __name__ == "__main__":
             print(Fore.BLUE, get_routes_between_stations(*userinput_grbs()))
             choice = print_choices()
         if choice == "3":
-            print(Fore.BLUE + register_customer(*userinput_rc()))
+            print(Fore.BLUE, register_customer(*userinput_rc()))
             choice = print_choices()
         if choice == "4":
-            print(Fore.BLUE + get_available_places(*userinput_gas()))
+            print(Fore.BLUE, print_available_places(*userinput_gas()))
             choice = print_choices()
         if choice == "5":       
-            print(Fore.BLUE + register_order(*userinput_ro()))
+            print("Give seats / beds as CarNo-PlaceNo separated by spaces")
+            print(Fore.BLUE, register_order(*userinput_ro()))
             choice = print_choices()
         if choice == "6":        
             print(get_future_customer_orders(*userinput_gco()))
             choice = print_choices()
-        if choice.lower() == "quit":
-            quit
+        if choice == "7":
+            exit()
         
         

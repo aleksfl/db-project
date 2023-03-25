@@ -12,7 +12,7 @@ def check_date_fields(day: int, month: int, year: int):
         error_handler("Invalid date day: " + str(day))
     if month > 12 or month < 1:
         error_handler("Invalid date month: " + str(month))
-    if year > 3000 or month < 1800:
+    if year > 3000 or year < 1800:
         error_handler("Invalid date year: " + str(year))
 
 def check_week_nr(week_nr: int):
