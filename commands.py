@@ -4,9 +4,19 @@ import prettytable
 import uuid
 from utils import check_weekday, check_week_nr, check_date_fields, error_handler, valid_weekdays
 from db_access import create_customer, create_order, get_all_orders_by_customer, get_route_station_times, get_routes, get_route_weekdays, get_order_places_by_order, get_arranged_cars_by_route, get_places, get_orders, get_route_station_times_by_route, RouteStationTime, get_car_types, Order, create_order_place
-# User stories c)
+
+
 def get_all_station_routes(station: str, weekday: str):
-    # Ensure only first letter in weekday is capitalized
+    """
+        Userstory C:
+        
+        Gets all the routes for a given station and weekday
+        
+        :param station: The station where the routes are departuring from
+        :param weekday: The weekday to be checked for routes
+        
+        :returns: A table with the route information for the given input
+    """
     station = str.capitalize(str.lower(station))
     weekday = str.capitalize(str.lower(weekday))
     if check_weekday(weekday) == False: 
@@ -36,9 +46,22 @@ def get_all_station_routes(station: str, weekday: str):
         table.add_row([r.route_id, r.name, r.operator_id, r.start_station_name, r.end_station_name, arrival_times[r.route_id]])
     return table
 
-# User stories d)
+
 def get_routes_between_stations(start_station: str, end_station: str, day_str: str, month_str: str, year_str: str):
-    # sourcery skip: low-code-quality
+    """
+        Userstory D:
+        
+        Gets all the routes that runs from one station to another on a given
+        date.
+        
+        :param start_station: The station of departure
+        :param end_station: The station of arrival
+        :param day_str: The day of the month (1-30/1)
+        :param month_str: Month of the year (1-12)
+        :param year_str: The year of the departure
+        
+        :returns: An table with a overview of the available departures that satisfy the given route.
+    """
     day = int(day_str)
     month = int(month_str)
     year = int(year_str)    
@@ -112,8 +135,18 @@ def get_routes_between_stations(start_station: str, end_station: str, day_str: s
         table.add_row([r, route.name, route.operator_id, route.start_station_name, route.end_station_name, route_times[r], days])
     return table
 
-# User stories e)
+
 def register_customer(name: str, email: str, mobile_number: str):
+    """
+        Userstory E:
+        
+        Registers a customer in the database based on the user input
+        
+        :param name: The name of the user
+        :param email: User's email
+        :param mobile_number: The users phone number
+        :returns: A confirmation of the registration.
+    """
     if name == "" or email == "" or mobile_number == "":
         error_handler("All fields must have a value")
         return "Failed"
@@ -121,6 +154,13 @@ def register_customer(name: str, email: str, mobile_number: str):
     return f"Customer registration for customer: {customer_id} finished"
 
 def get_stations_on_route(route_id: str) -> list[str]:
+    """
+        Fetches all the stations that is within a train route
+                
+        :param route_id: The primary key of the ROUTE-table
+
+        :returns: A list of all the stations in a route.
+    """
     station_times = get_route_station_times_by_route(int(route_id))
     not_start_or_end = []
     start_station = ""
@@ -138,8 +178,23 @@ def get_stations_on_route(route_id: str) -> list[str]:
     sorted_times.append(end_station)    
     return sorted_times
 
-# User stories g part 1)
+
 def get_available_places(route_id: str, day_str: str, month_str: str, year_str: str, start_station: str, end_station: str) -> list[str]:
+    """
+        Userstory G1
+        
+        FETCHES all the available seats on a departure. I.e. seats that are not booked.
+                
+        :param route_id: The primary key of the ROUTE-table
+        :param day_str: The day of the month (1-30/1)
+        :param month_str: Month of the year (1-12)
+        :param year_str: The year of the departure
+        :param start_station: The station of departure
+        :param end_station: The station of arrival
+        
+
+        :returns: A list of all the available seats for the chosen train departure.
+    """
     day = int(day_str)
     month = int(month_str)
     year = int(year_str)
@@ -197,6 +252,21 @@ def get_available_places(route_id: str, day_str: str, month_str: str, year_str: 
     return available_places
 
 def print_available_places(route_id: str, day_str: str, month_str: str, year_str: str, start_station: str, end_station: str):
+    """
+        Userstory G
+        
+        PRINTS all the available seats on a departure. I.e. seats that are not booked.
+                
+        :param route_id: The primary key of the ROUTE-table
+        :param day_str: The day of the month (1-30/1)
+        :param month_str: Month of the year (1-12)
+        :param year_str: The year of the departure
+        :param start_station: The station of departure
+        :param end_station: The station of arrival
+        
+
+        :returns: A table with all of the available seats for the chosen train departure.
+    """
     available_places = get_available_places(route_id, day_str, month_str, year_str, start_station, end_station)
     table = prettytable.PrettyTable(['Car No', 'Place No', "Place type"])
     for p in available_places:
@@ -204,8 +274,25 @@ def print_available_places(route_id: str, day_str: str, month_str: str, year_str
         table.add_row(items)   
     return table
 
-# User stories g part 2)
+
 def register_order(customer_id: str, start_station: str, end_station: str, route_id: str, day_str: str, month_str: str, year_str: str, places_str: str):
+    """
+        Userstory G2
+        
+        Registers an order for one or more seats/beds on a given departure and route
+            
+        :param customer_id: The customer - Primary key of the CUSTOMER-table 
+        :param start_station: The station of departure
+        :param end_station: The station of arrival
+        :param route_id: The primary key of the ROUTE-table
+        :param day_str: The day of the month (1-30/1)
+        :param month_str: Month of the year (1-12)
+        :param year_str: The year of the departure
+        :param places_str: A string with places to be booked (on the format "CarNo-PlaceNo")
+        
+
+        :returns: An order confirmation
+    """
     places = places_str.split()
     day = int(day_str)
     month = int(month_str)
@@ -249,6 +336,15 @@ def register_order(customer_id: str, start_station: str, end_station: str, route
     return (f"Registered order with id: {order_id} for places: {', '.join(places)}")
     
 def get_future_customer_orders(customer_id: str):
+    """
+        Userstory H
+        
+        Gives all the future orders for a given customer
+            
+        :param customer_id: The customer - Primary key of the CUSTOMER-table 
+
+        :returns: An table with all the customers orders
+    """
     orders = get_all_orders_by_customer(int(customer_id))        
     route_station_times = get_route_station_times()    
     now = datetime.now()    
