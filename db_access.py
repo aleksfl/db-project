@@ -134,13 +134,23 @@ class OrderPlace:
         self.place_no = place_no
         self.car_no = car_no
 
-def read_order_places():
+def get_order_places():
     conn = sqlite3.connect("train.db")
     cursor = conn.cursor()
 
     cursor.execute("SELECT * FROM ORDER_PLACE")
     results = cursor.fetchall()
     print(f"Fetched {len(results)} order places")
+    order_places = [RouteWeekday(row[0], row[1], row[2], row[3]) for row in results]
+    conn.close()
+    return order_places
+
+def get_order_places_by_order(order_id: int):
+    conn = sqlite3.connect("train.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM ORDER_PLACE WHERE OrderID = ?", (order_id))
+    results = cursor.fetchall()
+    print(f"Fetched {len(results)} order places for order id {order_id}")
     order_places = [RouteWeekday(row[0], row[1], row[2], row[3]) for row in results]
     conn.close()
     return order_places
