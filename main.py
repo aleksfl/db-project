@@ -1,7 +1,4 @@
-import sqlite3
-import os
 from commands import get_all_station_routes, get_routes_between_stations, print_available_places, register_customer, get_available_places, register_order, get_future_customer_orders
-import colorama
 from colorama import Fore
 
 print('''

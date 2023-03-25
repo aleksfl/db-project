@@ -1,7 +1,6 @@
 from datetime import date, time, datetime, timedelta
 import calendar
 import prettytable
-import uuid
 from utils import check_weekday, check_week_nr, check_date_fields, error_handler, valid_weekdays
 from db_access import create_customer, create_order, get_all_orders_by_customer, get_route_station_times, get_routes, get_route_weekdays, get_order_places_by_order, get_arranged_cars_by_route, get_places, get_orders, get_route_station_times_by_route, RouteStationTime, get_car_types, Order, create_order_place
 
